@@ -13,12 +13,12 @@ namespace SistemaDeVendasWeb.Services
             _context = context;
         }
 
-        public List<Seller> FindAll()
+        public async Task<List<Seller>> FindAllAsync()
         {
-            return _context.Seller.ToList();
+            return await _context.Seller.ToListAsync();
         }
 
-        public void Insert(Seller obj)
+        public async Task InsertAsync(Seller obj)
         {
             if (obj.BirthDate.Kind == DateTimeKind.Unspecified)
             {
@@ -26,38 +26,39 @@ namespace SistemaDeVendasWeb.Services
             }
 
             _context.Add(obj);
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
         }
 
         // FirstOrDefault allows to receive a LINQ function, but is more efficient use Firt when you search for a single atribute (id)
         // Use too for case when you want to return not found when is null ( Controller )
-        public Seller FindById(int id)
+        public async Task<Seller> FindByIdAsync(int id)
         {
             //Also search for department
             //Only FirsOrDefault or Firs, search for a single object "Seller" without "Department" associate
-            return _context.Seller.Include(s => s.Department).FirstOrDefault(x => x.Id == id);
+            return await _context.Seller.Include(s => s.Department).FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public void Remove(int id)
+        public async Task RemoveAsync(int id)
         {
-            var obj = _context.Seller.Find(id);
+            var obj = await _context.Seller.FindAsync(id);
             if (obj != null)
             {
                 _context.Seller.Remove(obj);
-                _context.SaveChanges();
+               await _context.SaveChangesAsync();
             }
         }
 
-        public void Update(Seller obj)
+        public async Task UpdateAsync(Seller obj)
         {
-            if(!_context.Seller.Any(x => x.Id == obj.Id))
+            bool hasAny = await _context.Seller.AnyAsync(x => x.Id == obj.Id);
+            if (!hasAny)
             {
                 throw new NotFoundException("Id not found");
             }
             try
             {
                 _context.Update(obj);
-                _context.SaveChanges();
+               await _context.SaveChangesAsync();
             }
             //Catches a db level exception and throws it as service level
             // MVC model( Service, Repository and Entities ) -> Controller -> View

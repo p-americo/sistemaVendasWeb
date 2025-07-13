@@ -1,4 +1,5 @@
-﻿using SistemaDeVendasWeb.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SistemaDeVendasWeb.Data;
 using SistemaDeVendasWeb.Models;
 namespace SistemaDeVendasWeb.Services
 {
@@ -10,9 +11,9 @@ namespace SistemaDeVendasWeb.Services
             _context = context;
         }
 
-        public List<Department> FindAll()
+        public async Task<List<Department>> FindAllAsync()
         {
-            return _context.Department.OrderBy(x => x.Name).ToList();
+            return await _context.Department.OrderBy(x => x.Name).ToListAsync();
         }
     }
 }
